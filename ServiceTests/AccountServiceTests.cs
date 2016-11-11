@@ -48,7 +48,7 @@ namespace ServiceTests
         public class TheWithdrawMethod
         {
             [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
-            public void Succeed_With_Valid_Input_Withdraw_All([Frozen]Mock<IAccountFactory> mockFactory,
+            public void Succeed_With_Valid_Input([Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 Account account,
                                                                 AccountService sut)

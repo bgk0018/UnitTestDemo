@@ -32,11 +32,5 @@ namespace Domain.ValueObjects
             Amount = amount;
             Currency = currency;
         }
-
-        public Money(Currency currency, decimal amount)
-        {
-            Currency = currency;
-            Amount = amount;
-        }
     }
 }

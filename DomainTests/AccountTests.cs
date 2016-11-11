@@ -42,7 +42,7 @@ namespace DomainTests
             [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
             public void Succeed_With_Valid_Input(Account sut)
             {
-                Money money = new Money(sut.CurrencyType, sut.Balance);
+                Money money = new Money(sut.Balance, sut.CurrencyType);
 
                 sut.Withdraw(money);
 
@@ -54,7 +54,7 @@ namespace DomainTests
             {
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
-                    Money money = new Money(sut.CurrencyType, sut.Balance + 1);
+                    Money money = new Money(sut.Balance + 1, sut.CurrencyType);
 
                     sut.Withdraw(money);
                 });
@@ -71,7 +71,7 @@ namespace DomainTests
 
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
-                    Money money = new Money(differentCurrency, sut.Balance);
+                    Money money = new Money(sut.Balance, differentCurrency);
 
                     sut.Withdraw(money);
                 });
@@ -85,7 +85,7 @@ namespace DomainTests
             {
                 var initialBalance = sut.Balance;
 
-                Money money = new Money(sut.CurrencyType, amount);
+                Money money = new Money(amount, sut.CurrencyType);
 
                 sut.Deposit(money);
 
@@ -103,7 +103,7 @@ namespace DomainTests
 
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
-                    Money money = new Money(differentCurrency, sut.Balance);
+                    Money money = new Money(sut.Balance, differentCurrency);
 
                     sut.Deposit(money);
                 });

@@ -15,12 +15,21 @@ namespace Domain.Accounts
 
         public Account Get(Guid id)
         {
-            return persistence.First(p=>p.Key == id).Value;
+            var persisted = persistence.First(p => p.Key == id).Value;
+
+            return new Account(persisted.Id, persisted.Balance, persisted.CurrencyType);
         }
 
         public void Save(Account account)
         {
-            persistence.Add(account.Id, account);
+            if(persistence.Any(p=>p.Key == account.Id))
+            {
+                persistence[account.Id] = account;
+            }
+            else
+            {
+                persistence.Add(account.Id, account);
+            }
         }
     }
 }

@@ -21,7 +21,7 @@ namespace DomainTests
             [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
             public void Succeed_With_Valid_Input(decimal amount, Currency currency)
             {
-                Money sut = new Money(currency, amount);
+                Money sut = new Money(amount, currency);
 
                 Assert.True(sut.Amount == amount && sut.Currency == currency);
             }
@@ -33,7 +33,7 @@ namespace DomainTests
 
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
-                    Money sut = new Money(currency, amount);
+                    Money sut = new Money(amount, currency);
                 });
             }
         }
