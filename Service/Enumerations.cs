@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Service
+﻿namespace Service
 {
     public enum Currency
     {
-        USD=1,
+        USD = 1,
         AUS,
         CAN
     }

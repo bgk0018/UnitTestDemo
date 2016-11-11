@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Domain.Accounts;
+using Domain.ValueObjects;
 using Service.Requests;
 using Service.Responses;
-using Domain.Accounts;
 using Service.Services;
-using Domain.ValueObjects;
+using System;
 
 namespace Service
 {
     public class AccountService : IAccountService
     {
-        IAccountRepository repo;
-        IAccountFactory factory;
-        Mapper mapper;
+        private readonly IAccountRepository repo;
+        private readonly IAccountFactory factory;
+        private readonly Mapper mapper;
 
         public AccountService(IAccountRepository repo, IAccountFactory factory)
         {

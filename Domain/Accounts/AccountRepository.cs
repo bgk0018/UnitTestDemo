@@ -1,12 +1,12 @@
-﻿using System.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Domain.Accounts
 {
     public class AccountRepository : IAccountRepository
     {
-        Dictionary<Guid, Account> persistence;
+        private Dictionary<Guid, Account> persistence;
 
         public AccountRepository()
         {
@@ -25,7 +25,7 @@ namespace Domain.Accounts
             if (account == null)
                 throw new ArgumentNullException("account");
 
-            if(persistence.Any(p=>p.Key == account.Id))
+            if (persistence.Any(p => p.Key == account.Id))
             {
                 persistence[account.Id] = account;
             }

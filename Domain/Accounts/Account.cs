@@ -1,5 +1,4 @@
-﻿using Domain;
-using Domain.ValueObjects;
+﻿using Domain.ValueObjects;
 using System;
 
 namespace Domain.Accounts

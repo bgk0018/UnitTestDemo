@@ -17,7 +17,7 @@ namespace ServiceTests
         //I'm not actually using any mocking behavior testing in TheConstructoreMethod class
         public class TheConstructorMethod
         {
-            [Theory(DisplayName= "Succeed_With_Valid_Input"), AutoMoqData]
+            [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
             public void Succeed_With_Valid_Input([Frozen]Mock<IAccountFactory> mockFactory,
                                                 [Frozen]Mock<IAccountRepository> mockRepo)
             {
@@ -59,7 +59,7 @@ namespace ServiceTests
                 //currency type is different between service contract and domain
                 var currency = new Mapper().Get(account.CurrencyType);
                 AccountWithdrawRequest request = new AccountWithdrawRequest(account.Id, account.Balance, currency);
-                
+
                 sut.Withdraw(request);
 
                 Assert.True(account.Balance == 0);
@@ -212,7 +212,6 @@ namespace ServiceTests
                     sut.Deposit(request);
                 });
             }
-
 
             [Theory(DisplayName = "Fail_With_Deposit_Negative_Amount"), AutoMoqData]
             public void Fail_With_Deposit_Negative_Amount([Frozen]Mock<IAccountFactory> mockFactory,
