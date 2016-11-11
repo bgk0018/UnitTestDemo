@@ -22,6 +22,9 @@ namespace Domain.Accounts
 
         public void Save(Account account)
         {
+            if (account == null)
+                throw new ArgumentNullException("account");
+
             if(persistence.Any(p=>p.Key == account.Id))
             {
                 persistence[account.Id] = account;

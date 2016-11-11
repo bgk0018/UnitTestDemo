@@ -83,6 +83,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountFactoryTests.cs" />
+    <Compile Include="AccountRepositoryTests.cs" />
     <Compile Include="AccountTests.cs" />
     <Compile Include="AutoMoq\AutoMoqDataAttribute.cs" />
     <Compile Include="MoneyTests.cs" />
