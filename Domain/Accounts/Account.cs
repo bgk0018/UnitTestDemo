@@ -5,9 +5,9 @@ namespace Domain.Accounts
 {
     public class Account
     {
-        private decimal balance;
+        public AccountNumber Number { get; private set; }
 
-        public Guid Id { get; private set; }
+        private decimal balance;
 
         public decimal Balance
         {
@@ -26,9 +26,9 @@ namespace Domain.Accounts
 
         public Currency CurrencyType { get; private set; }
 
-        public Account(Guid id, decimal balance, Currency currencyType)
+        public Account(AccountNumber accountNumber, decimal balance, Currency currencyType)
         {
-            Id = id;
+            Number = accountNumber;
             Balance = balance;
             CurrencyType = currencyType;
         }

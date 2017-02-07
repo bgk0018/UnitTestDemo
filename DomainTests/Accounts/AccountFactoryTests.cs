@@ -1,21 +1,22 @@
-﻿using Domain;
+﻿using System;
 using Domain.Accounts;
-using DomainTests.AutoMoq;
-using System;
+using Domain.Tests.Framework.AutoData;
 using Xunit;
+using Domain.Tests.Framework.Categories;
 
-namespace UnitTestDemo.Tests
+namespace Domain.Tests.Accounts
 {
     public class AccountFactoryTests
     {
+        [UnitTest]
         public class TheCreateMethod
         {
-            [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Succeed_With_Valid_Input(Currency currency, AccountFactory sut)
             {
                 var account = sut.Create(currency);
 
-                Assert.True(account.Balance == 0 && account.CurrencyType == currency && account.Id != Guid.Empty);
+                Assert.True(account.Balance == 0 && account.CurrencyType == currency);
             }
         }
     }

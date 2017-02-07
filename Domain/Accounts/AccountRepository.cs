@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.ValueObjects;
 
 namespace Domain.Accounts
 {
     public class AccountRepository : IAccountRepository
     {
-        private Dictionary<Guid, Account> persistence;
+        private Dictionary<AccountNumber, Account> persistence;
 
         public AccountRepository()
         {
-            persistence = new Dictionary<Guid, Account>();
+            persistence = new Dictionary<AccountNumber, Account>();
         }
 
-        public Account Get(Guid id)
+        public Account Get(AccountNumber number)
         {
-            var persisted = persistence.First(p => p.Key == id).Value;
+            var persisted = persistence.First(p => p.Key == number).Value;
 
-            return new Account(persisted.Id, persisted.Balance, persisted.CurrencyType);
+            return new Account(persisted.Number, persisted.Balance, persisted.CurrencyType);
         }
 
         public void Save(Account account)
@@ -25,13 +26,13 @@ namespace Domain.Accounts
             if (account == null)
                 throw new ArgumentNullException("account");
 
-            if (persistence.Any(p => p.Key == account.Id))
+            if (persistence.Any(p => p.Key == account.Number))
             {
-                persistence[account.Id] = account;
+                persistence[account.Number] = account;
             }
             else
             {
-                persistence.Add(account.Id, account);
+                persistence.Add(account.Number, account);
             }
         }
     }

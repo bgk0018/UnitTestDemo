@@ -1,7 +1,7 @@
-﻿using Domain.ValueObjects;
-using System;
+﻿using System;
+using Domain.ValueObjects;
 
-namespace Service
+namespace Service.Tests
 {
     internal class Mapper
     {

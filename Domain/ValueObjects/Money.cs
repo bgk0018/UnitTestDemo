@@ -2,31 +2,22 @@
 
 namespace Domain.ValueObjects
 {
-    public class Money
+    public struct Money
     {
-        private decimal amount;
+        private readonly decimal amount;
+        private readonly Currency currency;
 
-        public decimal Amount
-        {
-            get
-            {
-                return amount;
-            }
-            private set
-            {
-                if (value < 0)
-                    throw new ArgumentOutOfRangeException("value");
+        public decimal Amount { get { return amount; } }
 
-                amount = value;
-            }
-        }
-
-        public Currency Currency { get; private set; }
+        public Currency Currency { get { return currency; } }
 
         public Money(decimal amount, Currency currency)
         {
-            Amount = amount;
-            Currency = currency;
+            if (amount < 0)
+                throw new ArgumentOutOfRangeException("amount");
+
+            this.amount = amount;
+            this.currency = currency;
         }
     }
 }

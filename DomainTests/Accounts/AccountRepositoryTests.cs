@@ -1,31 +1,33 @@
-﻿using Domain.Accounts;
-using Domain.ValueObjects;
-using DomainTests.AutoMoq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Domain.Accounts;
+using Domain.Tests.Framework.AutoData;
+using Domain.ValueObjects;
 using Xunit;
+using Domain.Tests.Framework.Categories;
 
-namespace UnitTestDemo.Tests
+namespace Domain.Tests.Accounts
 {
     public class AccountRepositoryTests
     {
+        [UnitTest]
         public class TheSaveMethod
         {
-            [Theory(DisplayName = "Succeed_With_Add"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Succeed_With_Add(Account account,
                                                     AccountRepository sut)
             {
                 sut.Save(account);
             }
 
-            [Theory(DisplayName = "Succeed_With_Update"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Succeed_With_Update(decimal amount,
                                             Account account,
                                             AccountRepository sut)
             {
                 sut.Save(account);
-                var persistedAccount = sut.Get(account.Id);
+                var persistedAccount = sut.Get(account.Number);
                 Money money = new Money(amount, account.CurrencyType);
 
                 persistedAccount.Deposit(money);
@@ -33,7 +35,7 @@ namespace UnitTestDemo.Tests
                 sut.Save(account);
             }
 
-            [Theory(DisplayName = "Fail_On_Null_Account"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Fail_On_Null_Account(AccountRepository sut)
             {
                 Account nullAccount = null;
@@ -45,9 +47,10 @@ namespace UnitTestDemo.Tests
             }
         }
 
+        [UnitTest]
         public class TheGetMethod
         {
-            [Theory(DisplayName = "Succeed_On_Valid_Input"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Succeed_On_Valid_Input(List<Account> accounts, AccountRepository sut)
             {
                 var retrieve = accounts.FirstOrDefault();
@@ -57,13 +60,19 @@ namespace UnitTestDemo.Tests
                     sut.Save(account);
                 }
 
-                var result = sut.Get(retrieve.Id);
+                var result = sut.Get(retrieve.Number);
 
-                Assert.True(retrieve.Id == result.Id);
+                Assert.True(retrieve.Number == result.Number);
             }
 
-            [Theory(DisplayName = "Fail_On_Missing"), AutoMoqData]
-            public void Fail_On_Missing(List<Account> accounts, AccountRepository sut)
+            //This test could potentially fail since it is possible that
+            //the number we get from autofixture thats been randomly generated somehow
+            //is also generated in the account list
+            //if we wanted this test to be more robust, we'd probably first check
+            //and see if our missing number is in the generated list and augment it until
+            //its not in the list
+            [Theory, AutoMoqData]
+            public void Fail_On_Missing(AccountNumber missingNumber, List<Account> accounts, AccountRepository sut)
             {
                 var retrieve = accounts.FirstOrDefault();
 
@@ -74,7 +83,7 @@ namespace UnitTestDemo.Tests
 
                 Assert.Throws<InvalidOperationException>(() =>
                 {
-                    var result = sut.Get(Guid.NewGuid());
+                    var result = sut.Get(missingNumber);
                 });
             }
         }

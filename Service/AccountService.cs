@@ -2,8 +2,8 @@
 using Domain.ValueObjects;
 using Service.Requests;
 using Service.Responses;
-using Service.Services;
 using System;
+using Domain.Services;
 
 namespace Service
 {
@@ -28,21 +28,21 @@ namespace Service
 
         public AccountCreateResponse Create(AccountCreateRequest request)
         {
-            Domain.Currency domainCurrency = mapper.Get(request.CurrencyType);
+            var domainCurrency = mapper.Get(request.CurrencyType);
 
             var account = factory.Create(domainCurrency);
 
             repo.Save(account);
 
-            return new AccountCreateResponse(account.Id);
+            return new AccountCreateResponse(account.Number);
         }
 
         public void Deposit(AccountDepositRequest request)
         {
-            var account = repo.Get(request.Id);
+            var account = repo.Get(request.Number);
 
             var currency = mapper.Get(request.Currency);
-            Money money = new Money(request.Amount, currency);
+            var money = new Money(request.Amount, currency);
 
             account.Deposit(money);
 
@@ -51,22 +51,22 @@ namespace Service
 
         public AccountGetResponse Get(AccountGetRequest request)
         {
-            var account = repo.Get(request.Id);
+            var account = repo.Get(request.Number);
 
             var currency = mapper.Get(account.CurrencyType);
 
-            return new AccountGetResponse(account.Id, currency, account.Balance);
+            return new AccountGetResponse(account.Number, currency, account.Balance);
         }
 
         public void Transfer(AccountTransferRequest request)
         {
             var transferService = new AccountTransferService();
 
-            var to = repo.Get(request.DepositAccountId);
-            var from = repo.Get(request.WithdrawAccountId);
+            var to = repo.Get(request.DepositAccountNumber);
+            var from = repo.Get(request.WithdrawAccountNumber);
 
             var currency = mapper.Get(request.Currency);
-            Money money = new Money(request.Amount, currency);
+            var money = new Money(request.Amount, currency);
 
             //wraps up functionality that exists as a function of a relationship
             transferService.Transfer(money, to, from);
@@ -77,10 +77,11 @@ namespace Service
 
         public void Withdraw(AccountWithdrawRequest request)
         {
-            var account = repo.Get(request.Id);
+            var account = repo.Get(request.Number);
 
             var currency = mapper.Get(request.Currency);
-            Money money = new Money(request.Amount, currency);
+
+            var money = new Money(request.Amount, currency);
 
             account.Withdraw(money);
 

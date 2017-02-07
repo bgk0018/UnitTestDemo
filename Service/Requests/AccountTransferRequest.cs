@@ -1,21 +1,22 @@
 ﻿using System;
+using Domain.ValueObjects;
 
 namespace Service.Requests
 {
     public class AccountTransferRequest
     {
-        public Guid WithdrawAccountId { get; private set; }
+        public AccountNumber WithdrawAccountNumber { get; private set; }
 
-        public Guid DepositAccountId { get; private set; }
+        public AccountNumber DepositAccountNumber { get; private set; }
 
         public decimal Amount { get; private set; }
 
         public Currency Currency { get; private set; }
 
-        public AccountTransferRequest(Guid withdrawAccountId, Guid depositAccountId, decimal amount, Currency currency)
+        public AccountTransferRequest(AccountNumber withdrawAccountNumber, AccountNumber depositAccountNumber, decimal amount, Currency currency)
         {
-            WithdrawAccountId = withdrawAccountId;
-            DepositAccountId = depositAccountId;
+            WithdrawAccountNumber = withdrawAccountNumber;
+            DepositAccountNumber = depositAccountNumber;
             Amount = amount;
             Currency = currency;
         }

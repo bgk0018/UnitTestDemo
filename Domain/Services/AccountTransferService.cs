@@ -1,7 +1,7 @@
 ﻿using Domain.Accounts;
 using Domain.ValueObjects;
 
-namespace Service.Services
+namespace Domain.Services
 {
     public class AccountTransferService
     {

@@ -1,14 +1,15 @@
 ﻿using System;
+using Domain.ValueObjects;
 
 namespace Service.Requests
 {
     public class AccountGetRequest
     {
-        public Guid Id { get; private set; }
+        public AccountNumber Number { get; private set; }
 
-        public AccountGetRequest(Guid id)
+        public AccountGetRequest(AccountNumber number)
         {
-            Id = id;
+            Number = number;
         }
     }
 }

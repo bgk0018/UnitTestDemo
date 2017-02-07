@@ -1,30 +1,32 @@
-﻿using Domain.Accounts;
+﻿using System;
+using System.Linq;
+using Domain.Accounts;
 using Moq;
 using Ploeh.AutoFixture;
 using Ploeh.AutoFixture.Xunit2;
-using Service;
 using Service.Requests;
-using ServiceTests.AutoMoq;
-using System;
-using System.Linq;
+using Service.Tests.Framework.AutoData;
+using Service.Tests.Framework.Categories;
 using Xunit;
+using Domain.ValueObjects;
 
-namespace ServiceTests
+namespace Service.Tests
 {
     public class AccountServiceTests
     {
         //I've used mock objects to just show that Autofixture AutoMoqDataAttribute can generate these
-        //I'm not actually using any mocking behavior testing in TheConstructoreMethod class
+        //I'm not actually using any mocking behavior testing in TheConstructorMethod class
+        [UnitTest]
         public class TheConstructorMethod
         {
-            [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Succeed_With_Valid_Input([Frozen]Mock<IAccountFactory> mockFactory,
                                                 [Frozen]Mock<IAccountRepository> mockRepo)
             {
                 IAccountService sut = new AccountService(mockRepo.Object, mockFactory.Object);
             }
 
-            [Theory(DisplayName = "Fail_With_Null_Factory"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Fail_With_Null_Factory([Frozen]Mock<IAccountRepository> mockRepo)
             {
                 Assert.Throws<ArgumentNullException>(() =>
@@ -33,7 +35,7 @@ namespace ServiceTests
                 });
             }
 
-            [Theory(DisplayName = "Fail_With_Null_Repository"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Fail_With_Null_Repository([Frozen]Mock<IAccountFactory> mockFactory)
             {
                 Assert.Throws<ArgumentNullException>(() =>
@@ -45,27 +47,28 @@ namespace ServiceTests
 
         //[Frozen] returns the same reference to the object being injected into the AccountService for the mockFactory or mockRepo
         // http://blog.ploeh.dk/2010/10/08/AutoDataTheorieswithAutoFixture
+        [UnitTest]
         public class TheWithdrawMethod
         {
-            [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Succeed_With_Valid_Input([Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 Account account,
                                                                 AccountService sut)
             {
                 //Setup mock to return specified account with specified paramter account.Id
-                mockRepo.Setup(p => p.Get(account.Id)).Returns(account);
+                mockRepo.Setup(p => p.Get(account.Number)).Returns(account);
 
                 //currency type is different between service contract and domain
                 var currency = new Mapper().Get(account.CurrencyType);
-                AccountWithdrawRequest request = new AccountWithdrawRequest(account.Id, account.Balance, currency);
+                AccountWithdrawRequest request = new AccountWithdrawRequest(account.Number, account.Balance, currency);
 
                 sut.Withdraw(request);
 
                 Assert.True(account.Balance == 0);
             }
 
-            [Theory(DisplayName = "Verify_Repository_Call_Count"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Verify_Repository_Call_Count([Frozen]Mock<IAccountFactory> mockFactory,
                                                         [Frozen]Mock<IAccountRepository> mockRepo,
                                                         Account account,
@@ -73,35 +76,35 @@ namespace ServiceTests
             {
                 //currency type is different between service contract and domain
                 var currency = new Mapper().Get(account.CurrencyType);
-                AccountWithdrawRequest request = new AccountWithdrawRequest(account.Id, account.Balance, currency);
+                AccountWithdrawRequest request = new AccountWithdrawRequest(account.Number, account.Balance, currency);
 
                 //Setup mock to return specified account with specified parameter account.Id
-                mockRepo.Setup(p => p.Get(account.Id)).Returns(account);
+                mockRepo.Setup(p => p.Get(account.Number)).Returns(account);
 
                 sut.Withdraw(request);
 
-                mockRepo.Verify(p => p.Get(account.Id), Times.Once);
+                mockRepo.Verify(p => p.Get(account.Number), Times.Once);
             }
 
-            [Theory(DisplayName = "Fail_With_Invalid_Currency"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Fail_With_Invalid_Currency([Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 Account account,
                                                                 AccountService sut)
             {
                 //selecting a different CurrencyType than what the Account was generated with
-                var domainCurrency = Enum.GetValues(typeof(Domain.Currency))
+                var domainCurrency = Enum
+                                        .GetValues(typeof(Domain.Currency))
                                         .Cast<Domain.Currency>()
-                                        .Where(p => p != account.CurrencyType)
-                                        .FirstOrDefault();
+                                        .FirstOrDefault(p => p != account.CurrencyType);
 
                 //currency type is different between service contract and domain
                 var differentCurrency = new Mapper().Get(domainCurrency);
 
                 //Setup mock to return specified account with specified parameter account.Id
-                mockRepo.Setup(p => p.Get(account.Id)).Returns(account);
+                mockRepo.Setup(p => p.Get(account.Number)).Returns(account);
 
-                AccountWithdrawRequest request = new AccountWithdrawRequest(account.Id, account.Balance, differentCurrency);
+                AccountWithdrawRequest request = new AccountWithdrawRequest(account.Number, account.Balance, differentCurrency);
 
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
@@ -109,7 +112,7 @@ namespace ServiceTests
                 });
             }
 
-            [Theory(DisplayName = "Fail_With_Withdraw_Over_Balance"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Fail_With_Withdraw_Over_Balance([Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 Account account,
@@ -117,10 +120,10 @@ namespace ServiceTests
             {
                 //currency type is different between service contract and domain
                 var currency = new Mapper().Get(account.CurrencyType);
-                AccountWithdrawRequest request = new AccountWithdrawRequest(account.Id, account.Balance + 1, currency);
+                AccountWithdrawRequest request = new AccountWithdrawRequest(account.Number, account.Balance + 1, currency);
 
                 //Setup mock to return specified account with specified parameter account.Id
-                mockRepo.Setup(p => p.Get(account.Id)).Returns(account);
+                mockRepo.Setup(p => p.Get(account.Number)).Returns(account);
 
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
@@ -128,7 +131,7 @@ namespace ServiceTests
                 });
             }
 
-            [Theory(DisplayName = "Fail_With_Withdraw_Negative_Amount"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Fail_With_Withdraw_Negative_Amount([Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 Account account,
@@ -136,10 +139,10 @@ namespace ServiceTests
             {
                 //currency type is different between service contract and domain
                 var currency = new Mapper().Get(account.CurrencyType);
-                AccountWithdrawRequest request = new AccountWithdrawRequest(account.Id, -1, currency);
+                AccountWithdrawRequest request = new AccountWithdrawRequest(account.Number, -1, currency);
 
                 //Setup mock to return specified account with specified parameter account.Id
-                mockRepo.Setup(p => p.Get(account.Id)).Returns(account);
+                mockRepo.Setup(p => p.Get(account.Number)).Returns(account);
 
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
@@ -148,6 +151,7 @@ namespace ServiceTests
             }
         }
 
+        [UnitTest]
         public class TheDepositMethod
         {
             [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
@@ -157,11 +161,11 @@ namespace ServiceTests
                                                                 AccountService sut)
             {
                 //Setup mock to return specified account with specified paramter account.Id
-                mockRepo.Setup(p => p.Get(account.Id)).Returns(account);
+                mockRepo.Setup(p => p.Get(account.Number)).Returns(account);
 
                 //currency type is different between service contract and domain
                 var currency = new Mapper().Get(account.CurrencyType);
-                AccountDepositRequest request = new AccountDepositRequest(account.Id, account.Balance, currency);
+                AccountDepositRequest request = new AccountDepositRequest(account.Number, account.Balance, currency);
                 var balance = account.Balance;
 
                 sut.Deposit(request);
@@ -169,7 +173,7 @@ namespace ServiceTests
                 Assert.True(account.Balance == balance * 2);
             }
 
-            [Theory(DisplayName = "Verify_Repository_Call_Count"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Verify_Repository_Call_Count([Frozen]Mock<IAccountFactory> mockFactory,
                                                         [Frozen]Mock<IAccountRepository> mockRepo,
                                                         Account account,
@@ -177,35 +181,35 @@ namespace ServiceTests
             {
                 //currency type is different between service contract and domain
                 var currency = new Mapper().Get(account.CurrencyType);
-                AccountDepositRequest request = new AccountDepositRequest(account.Id, account.Balance, currency);
+                AccountDepositRequest request = new AccountDepositRequest(account.Number, account.Balance, currency);
 
                 //Setup mock to return specified account with specified parameter account.Id
-                mockRepo.Setup(p => p.Get(account.Id)).Returns(account);
+                mockRepo.Setup(p => p.Get(account.Number)).Returns(account);
 
                 sut.Deposit(request);
 
-                mockRepo.Verify(p => p.Get(account.Id), Times.Once);
+                mockRepo.Verify(p => p.Get(account.Number), Times.Once);
             }
 
-            [Theory(DisplayName = "Fail_With_Invalid_Currency"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Fail_With_Invalid_Currency([Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 Account account,
                                                                 AccountService sut)
             {
                 //selecting a different CurrencyType than what the Account was generated with
-                var domainCurrency = Enum.GetValues(typeof(Domain.Currency))
+                var domainCurrency = Enum
+                                        .GetValues(typeof(Domain.Currency))
                                         .Cast<Domain.Currency>()
-                                        .Where(p => p != account.CurrencyType)
-                                        .FirstOrDefault();
+                                        .FirstOrDefault(p => p != account.CurrencyType);
 
                 //currency type is different between service contract and domain
                 var differentCurrency = new Mapper().Get(domainCurrency);
 
                 //Setup mock to return specified account with specified parameter account.Id
-                mockRepo.Setup(p => p.Get(account.Id)).Returns(account);
+                mockRepo.Setup(p => p.Get(account.Number)).Returns(account);
 
-                AccountDepositRequest request = new AccountDepositRequest(account.Id, account.Balance, differentCurrency);
+                AccountDepositRequest request = new AccountDepositRequest(account.Number, account.Balance, differentCurrency);
 
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
@@ -213,7 +217,7 @@ namespace ServiceTests
                 });
             }
 
-            [Theory(DisplayName = "Fail_With_Deposit_Negative_Amount"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Fail_With_Deposit_Negative_Amount([Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 Account account,
@@ -221,10 +225,10 @@ namespace ServiceTests
             {
                 //currency type is different between service contract and domain
                 var currency = new Mapper().Get(account.CurrencyType);
-                AccountDepositRequest request = new AccountDepositRequest(account.Id, -1, currency);
+                AccountDepositRequest request = new AccountDepositRequest(account.Number, -1, currency);
 
                 //Setup mock to return specified account with specified parameter account.Id
-                mockRepo.Setup(p => p.Get(account.Id)).Returns(account);
+                mockRepo.Setup(p => p.Get(account.Number)).Returns(account);
 
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
@@ -233,10 +237,13 @@ namespace ServiceTests
             }
         }
 
+        [UnitTest]
         public class TheTransferMethod
         {
-            [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
-            public void Succeed_With_Valid_Input([Frozen]Mock<IAccountFactory> mockFactory,
+            [Theory, AutoMoqData]
+            public void Succeed_With_Valid_Input(AccountNumber toAccountNumber,
+                                                    AccountNumber fromAccountNumber,
+                                                                [Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 AccountService sut)
             {
@@ -244,14 +251,14 @@ namespace ServiceTests
                 //so I will attempt to anonymize whatever I can using the fixture
                 var fixture = new Fixture();
 
-                var to = new Account(Guid.NewGuid(), fixture.Create<decimal>(), Domain.Currency.AUS);
-                var from = new Account(Guid.NewGuid(), fixture.Create<decimal>(), Domain.Currency.AUS);
+                var to = new Account(toAccountNumber, fixture.Create<decimal>(), Domain.Currency.AUS);
+                var from = new Account(fromAccountNumber, fixture.Create<decimal>(), Domain.Currency.AUS);
 
-                mockRepo.Setup(p => p.Get(to.Id)).Returns(to);
-                mockRepo.Setup(p => p.Get(from.Id)).Returns(from);
+                mockRepo.Setup(p => p.Get(to.Number)).Returns(to);
+                mockRepo.Setup(p => p.Get(from.Number)).Returns(from);
 
                 var currency = new Mapper().Get(to.CurrencyType);
-                AccountTransferRequest request = new AccountTransferRequest(from.Id, to.Id, from.Balance, Currency.AUS);
+                var request = new AccountTransferRequest(from.Number, to.Number, from.Balance, Currency.AUS);
                 var toBalance = to.Balance;
                 var fromBalance = from.Balance;
 
@@ -261,32 +268,35 @@ namespace ServiceTests
             }
         }
 
+        [UnitTest]
         public class TheCreateMethod
         {
-            [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
-            public void Succeed_With_Valid_Input([Frozen]Mock<IAccountFactory> mockFactory,
+            [Theory, AutoMoqData]
+            public void Succeed_With_Valid_Input(AccountNumber number,
+                                                                [Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 AccountCreateRequest request,
                                                                 AccountService sut)
             {
                 var domainCurrency = new Mapper().Get(request.CurrencyType);
-                var account = new Account(Guid.NewGuid(), 0, domainCurrency);
+                var account = new Account(number, 0, domainCurrency);
 
                 mockFactory.Setup(p => p.Create(domainCurrency)).Returns(account);
 
                 var response = sut.Create(request);
 
-                Assert.True(response.Id == account.Id);
+                Assert.True(response.Number == account.Number);
             }
 
-            [Theory(DisplayName = "Verify_Factory_Call_Count"), AutoMoqData]
-            public void Verify_Factory_Call_Count([Frozen]Mock<IAccountFactory> mockFactory,
+            [Theory, AutoMoqData]
+            public void Verify_Factory_Call_Count(AccountNumber number,
+                                                                [Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 AccountCreateRequest request,
                                                                 AccountService sut)
             {
                 var domainCurrency = new Mapper().Get(request.CurrencyType);
-                var account = new Account(Guid.NewGuid(), 0, domainCurrency);
+                var account = new Account(number, 0, domainCurrency);
 
                 mockFactory.Setup(p => p.Create(domainCurrency)).Returns(account);
 
@@ -295,14 +305,15 @@ namespace ServiceTests
                 mockFactory.Verify(p => p.Create(account.CurrencyType), Times.Once);
             }
 
-            [Theory(DisplayName = "Verify_Repository_Call_Count"), AutoMoqData]
-            public void Verify_Repository_Call_Count([Frozen]Mock<IAccountFactory> mockFactory,
+            [Theory, AutoMoqData]
+            public void Verify_Repository_Call_Count(AccountNumber number,
+                                                                [Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 AccountCreateRequest request,
                                                                 AccountService sut)
             {
                 var domainCurrency = new Mapper().Get(request.CurrencyType);
-                var account = new Account(Guid.NewGuid(), 0, domainCurrency);
+                var account = new Account(number, 0, domainCurrency);
 
                 mockFactory.Setup(p => p.Create(domainCurrency)).Returns(account);
 
@@ -312,36 +323,37 @@ namespace ServiceTests
             }
         }
 
+        [UnitTest]
         public class TheGetMethod
         {
-            [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Succeed_With_Valid_Input([Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 Account account,
                                                                 AccountService sut)
             {
-                mockRepo.Setup(p => p.Get(account.Id)).Returns(account);
+                mockRepo.Setup(p => p.Get(account.Number)).Returns(account);
 
-                AccountGetRequest request = new AccountGetRequest(account.Id);
+                AccountGetRequest request = new AccountGetRequest(account.Number);
 
                 var result = sut.Get(request);
 
-                Assert.True(account.Id == result.Id);
+                Assert.True(account.Number == result.Number);
             }
 
-            [Theory(DisplayName = "Verify_Repository_Call_Count"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Verify_Repository_Call_Count([Frozen]Mock<IAccountFactory> mockFactory,
                                                                 [Frozen]Mock<IAccountRepository> mockRepo,
                                                                 Account account,
                                                                 AccountService sut)
             {
-                mockRepo.Setup(p => p.Get(account.Id)).Returns(account);
+                mockRepo.Setup(p => p.Get(account.Number)).Returns(account);
 
-                AccountGetRequest request = new AccountGetRequest(account.Id);
+                AccountGetRequest request = new AccountGetRequest(account.Number);
 
                 var result = sut.Get(request);
 
-                mockRepo.Verify(p => p.Get(account.Id), Times.Once);
+                mockRepo.Verify(p => p.Get(account.Number), Times.Once);
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System;
+using Domain.ValueObjects;
 
 namespace Service.Requests
 {
@@ -8,11 +9,11 @@ namespace Service.Requests
 
         public Currency Currency { get; private set; }
 
-        public Guid Id { get; private set; }
+        public AccountNumber Number { get; private set; }
 
-        public AccountWithdrawRequest(Guid id, decimal amount, Currency currency)
+        public AccountWithdrawRequest(AccountNumber number, decimal amount, Currency currency)
         {
-            Id = id;
+            Number = number;
             Amount = amount;
             Currency = currency;
         }

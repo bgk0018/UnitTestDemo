@@ -1,12 +1,12 @@
-﻿using Domain;
-using Domain.Accounts;
-using Domain.ValueObjects;
-using DomainTests.AutoMoq;
-using System;
+﻿using System;
 using System.Linq;
+using Domain.Accounts;
+using Domain.Tests.Framework.AutoData;
+using Domain.Tests.Framework.Categories;
+using Domain.ValueObjects;
 using Xunit;
 
-namespace DomainTests
+namespace Domain.Tests.Accounts
 {
     //Below shows anonymized data using Autofixture + xUnit Attribute
     //Parameters passed into tests are generated via Fixture class through the AutoMoqDataAttribute
@@ -14,96 +14,99 @@ namespace DomainTests
     //Refer to ServiceTests for Mocking usage
     public class AccountTests
     {
+        [UnitTest]
         public class TheConstructorMethod
         {
             //Autofixture defaults to generating positive numbers by default, thus why we can just take the anonymized amount
-            [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
-            public void Succeed_With_Valid_Input(Guid id, decimal amount, Currency currency)
+            [Theory, AutoMoqData]
+            public void Succeed_With_Valid_Input(AccountNumber number, decimal amount, Currency currency)
             {
-                Account sut = new Account(id, amount, currency);
+                var sut = new Account(number, amount, currency);
 
-                Assert.True(sut.Balance == amount && sut.Id == id && sut.CurrencyType == currency);
+                Assert.True(sut.Balance == amount && sut.Number == number && sut.CurrencyType == currency);
             }
 
-            [Theory(DisplayName = "Fail_With_Negative_Amount"), AutoMoqData]
-            public void Fail_With_Negative_Amount(Guid id, Currency currency)
+            [Theory, AutoMoqData]
+            public void Fail_With_Negative_Amount(AccountNumber number, Currency currency)
             {
                 decimal amount = -30;
 
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
-                    Account sut = new Account(id, amount, currency);
+                    var sut = new Account(number, amount, currency);
                 });
             }
         }
 
+        [UnitTest]
         public class TheWithdrawMethod
         {
-            [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Succeed_With_Valid_Input(Account sut)
             {
-                Money money = new Money(sut.Balance, sut.CurrencyType);
+                var money = new Money(sut.Balance, sut.CurrencyType);
 
                 sut.Withdraw(money);
 
                 Assert.True(sut.Balance == 0);
             }
 
-            [Theory(DisplayName = "Fail_With_Amount_Exceeds_Balance"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Fail_With_Amount_Exceeds_Balance(Account sut)
             {
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
-                    Money money = new Money(sut.Balance + 1, sut.CurrencyType);
+                    var money = new Money(sut.Balance + 1, sut.CurrencyType);
 
                     sut.Withdraw(money);
                 });
             }
 
-            [Theory(DisplayName = "Fail_With_Incorrect_Currency"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Fail_With_Incorrect_Currency(Account sut)
             {
                 //selecting a different CurrencyType than what the Account was generated with
-                var differentCurrency = Enum.GetValues(typeof(Currency))
+                var differentCurrency = Enum
+                                        .GetValues(typeof(Currency))
                                         .Cast<Currency>()
-                                        .Where(p => p != sut.CurrencyType)
-                                        .FirstOrDefault();
+                                        .FirstOrDefault(p => p != sut.CurrencyType);
 
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
-                    Money money = new Money(sut.Balance, differentCurrency);
+                    var money = new Money(sut.Balance, differentCurrency);
 
                     sut.Withdraw(money);
                 });
             }
         }
 
+        [UnitTest]
         public class TheDepositMethod
         {
-            [Theory(DisplayName = "Succeed_With_Valid_Input"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Succeed_With_Valid_Input(Account sut, decimal amount)
             {
                 var initialBalance = sut.Balance;
 
-                Money money = new Money(amount, sut.CurrencyType);
+                var money = new Money(amount, sut.CurrencyType);
 
                 sut.Deposit(money);
 
                 Assert.True(sut.Balance == initialBalance + amount);
             }
 
-            [Theory(DisplayName = "Fail_With_Incorrect_Currency"), AutoMoqData]
+            [Theory, AutoMoqData]
             public void Fail_With_Incorrect_Currency(Account sut)
             {
                 //selecting a different CurrencyType than what the Account was generated with
-                var differentCurrency = Enum.GetValues(typeof(Currency))
+                var differentCurrency = Enum
+                                        .GetValues(typeof(Currency))
                                         .Cast<Currency>()
-                                        .Where(p => p != sut.CurrencyType)
-                                        .FirstOrDefault();
+                                        .FirstOrDefault(p => p != sut.CurrencyType);
 
                 Assert.Throws<ArgumentOutOfRangeException>(() =>
                 {
-                    Money money = new Money(sut.Balance, differentCurrency);
+                    var money = new Money(sut.Balance, differentCurrency);
 
                     sut.Deposit(money);
                 });

@@ -1,4 +1,5 @@
 ﻿using System;
+using Domain.ValueObjects;
 
 namespace Domain.Accounts
 {
@@ -6,6 +7,6 @@ namespace Domain.Accounts
     {
         void Save(Account account);
 
-        Account Get(Guid id);
+        Account Get(AccountNumber id);
     }
 }

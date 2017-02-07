@@ -8,8 +8,8 @@
     <ProjectGuid>{61DE73E0-697D-4BCE-B6D2-068B81DDFD41}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UnitTestDemo.Tests</RootNamespace>
-    <AssemblyName>UnitTestDemo.Tests</AssemblyName>
+    <RootNamespace>Domain.Tests</RootNamespace>
+    <AssemblyName>Domain.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -83,12 +83,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccountFactoryTests.cs" />
-    <Compile Include="AccountRepositoryTests.cs" />
-    <Compile Include="AccountTests.cs" />
-    <Compile Include="AutoMoq\AutoMoqDataAttribute.cs" />
-    <Compile Include="MoneyTests.cs" />
+    <Compile Include="Accounts\AccountFactoryTests.cs" />
+    <Compile Include="Accounts\AccountRepositoryTests.cs" />
+    <Compile Include="Accounts\AccountTests.cs" />
+    <Compile Include="Framework\AutoData\AutoMoqDataAttribute.cs" />
+    <Compile Include="Framework\AutoData\TestingConventions.cs" />
+    <Compile Include="Framework\Categories\CategoryAttribute.cs" />
+    <Compile Include="Framework\Categories\CategoryDiscoverer.cs" />
+    <Compile Include="Framework\Categories\IntegrationTestAttribute.cs" />
+    <Compile Include="Framework\Categories\IntegrationTestDiscoverer.cs" />
+    <Compile Include="Framework\Categories\UnitTestAttribute.cs" />
+    <Compile Include="Framework\Categories\UnitTestDiscoverer.cs" />
+    <Compile Include="Framework\Customizations\AccountNumberCustomization.cs" />
+    <Compile Include="ValueObjects\AccountNumberTests.cs" />
+    <Compile Include="ValueObjects\MoneyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\AccountTransferServiceTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj">
@@ -103,6 +113,7 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

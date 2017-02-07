@@ -1,15 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service", "Service\Service.csproj", "{E90EF5A8-555F-45C4-B7AC-A26925FE1DED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{2DC1557C-CD43-4DB6-8349-AB72EF8DDA59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceTests", "ServiceTests\ServiceTests.csproj", "{B11CEF68-91B2-4CDA-B6D3-ED2E26DDACA1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Service.Tests", "ServiceTests\Service.Tests.csproj", "{B11CEF68-91B2-4CDA-B6D3-ED2E26DDACA1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomainTests", "DomainTests\DomainTests.csproj", "{61DE73E0-697D-4BCE-B6D2-068B81DDFD41}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Tests", "DomainTests\Domain.Tests.csproj", "{61DE73E0-697D-4BCE-B6D2-068B81DDFD41}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3E49E92C-BE79-4F48-BB5C-90871B7AB601}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,5 +38,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B11CEF68-91B2-4CDA-B6D3-ED2E26DDACA1} = {3E49E92C-BE79-4F48-BB5C-90871B7AB601}
+		{61DE73E0-697D-4BCE-B6D2-068B81DDFD41} = {3E49E92C-BE79-4F48-BB5C-90871B7AB601}
 	EndGlobalSection
 EndGlobal
